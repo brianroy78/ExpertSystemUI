@@ -15,8 +15,40 @@ function abstractFetch(path: string, obj: any, callback: Function) {
 
 export function insert(obj: any, callback: Function) { return abstractFetch('/insert', obj, callback) }
 export function list(obj: any, callback: Function) { return abstractFetch('/list', obj, callback) }
-export function listRules(obj: any, callback: Function) { return abstractFetch('/rules/list', obj, callback) }
 export function getRules(obj: any, callback: Function) { return abstractFetch('/inference/get/rules', obj, callback) }
 export function getVariable(obj: any, callback: Function) { return abstractFetch('/inference/get/variable', obj, callback) }
 export function inferenceRespond(obj: any, callback: Function) { return abstractFetch('/inference/respond', obj, callback) }
 export function parseFacts(obj: any, callback: Function) { return abstractFetch('/parse/facts', obj, callback) }
+
+export function listVariables(callback: Function) {
+    list({
+        _type_: 'variable',
+        _relations_: [{ _relation_name_: 'options' }]
+    }, (json: any) => {
+        callback(json)
+    })
+}
+
+export function listRules(callback: Function) {
+    list({
+        _type_: 'rule',
+        _relations_: [
+            {
+                _relation_name_: 'premises',
+                _relations_: [
+                    { _relation_name_: 'variable' },
+                    { _relation_name_: 'value' },
+                ]
+            },
+            {
+                _relation_name_: 'statement',
+                _relations_: [
+                    { _relation_name_: 'variable' },
+                    { _relation_name_: 'value' },
+                ]
+            }
+        ]
+    }, (json: any) => {
+        callback(json)
+    })
+}

@@ -1,7 +1,7 @@
 import { Button, Grid, Typography } from '@mui/material'
 import React, { useEffect } from 'react'
 import SmallTextField from '../custom/SmallTextField'
-import { getRules, getVariable, inferenceRespond, listRules, parseFacts } from '../fetcher'
+import { getRules, getVariable, inferenceRespond, parseFacts } from '../fetcher'
 
 export default function InferenceView() {
 
@@ -45,7 +45,7 @@ export default function InferenceView() {
 
 
     return (
-        <Grid container spacing={2} style={{ display: 'flex', margin: 'auto' }}>
+        <Grid container spacing={2}>
             {(Object.keys(variable).length > 0) ? (
                 <Grid item xs={6}>
                     <Grid item xs={12}>

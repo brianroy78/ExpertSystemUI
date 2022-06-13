@@ -2,9 +2,10 @@ import React, { useEffect } from 'react'
 
 import Paper from '@mui/material/Paper';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { insert, list } from '../fetcher';
+import { insert, listVariables } from '../fetcher';
 import SmallTextField from '../custom/SmallTextField';
 import CustomBox from '../custom/CustomBox';
+import { removeElement, replaceElement } from '../utils';
 
 export default function VariableView() {
 
@@ -27,35 +28,11 @@ export default function VariableView() {
         })
     }
 
-    const onNameTextFielChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setName(event.target.value)
-    }
-
-    const fetchVariables = () => {
-        list({
-            __type__: 'variable',
-            __relations__: [{ __relation_name__: 'options' }]
-        }, (json: any) => {
-            setrows(json.data);
-        })
-    }
-
-    const addValue = () => {
-        let subValue = { index: values.length, name: '' }
-        setValues(values.concat(subValue))
-    }
-
-    const removeValue = (index: number) => {
-        let clone = [...values];
-        clone.splice(index, 1)
-        setValues(clone)
-    }
-
-    const onChangeValue = (index: number, value: string) => {
-        let clone = [...values];
-        clone[index] = { index: index, name: value }
-        setValues(clone)
-    }
+    const onNameTextFielChange = (event: any) => { setName(event.target.value) }
+    const fetchVariables = () => { listVariables((json: any) => { setrows(json.data); }) }
+    const addValue = () => { setValues(values.concat({ name: '' })) }
+    const removeValue = (index: number) => { setValues(removeElement(values, index)) }
+    const onChangeValue = (index: number, value: string) => { setValues(replaceElement(values, index, { name: value })) }
 
     useEffect(() => {
         async function componentDidMount() { fetchVariables() }
@@ -63,7 +40,7 @@ export default function VariableView() {
     }, []);
 
     return (
-        <div style={{ display: 'flex', margin: 'auto' }}>
+        <React.Fragment>
             <CustomBox style={{ borderStyle: "solid", padding: '20px', borderWidth: '1px' }} >
                 <SmallTextField
                     label="Nombre de la Variable"
@@ -81,20 +58,20 @@ export default function VariableView() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {values.map((row: any) => (
+                            {values.map((row: any, index: number) => (
                                 <TableRow
-                                    key={row.index.toString()}
+                                    key={index.toString()}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
                                         <SmallTextField
                                             value={row.name}
-                                            onChange={(event: any) => { onChangeValue(row.index, event.target.value) }}
+                                            onChange={(event: any) => { onChangeValue(index, event.target.value) }}
                                         />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <Button
-                                            onClick={() => { removeValue(row.index) }}
+                                            onClick={() => { removeValue(index) }}
                                         >
                                             Eliminar
                                         </Button>
@@ -134,6 +111,6 @@ export default function VariableView() {
                     </Table>
                 </TableContainer>
             </CustomBox>
-        </div>
+        </React.Fragment>
     );
 }

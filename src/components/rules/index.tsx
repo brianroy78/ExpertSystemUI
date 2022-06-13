@@ -2,18 +2,18 @@ import React, { useEffect } from 'react'
 
 import Paper from '@mui/material/Paper';
 import { Button, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { insert, list, listRules } from '../fetcher';
+import { insert, listRules, listVariables } from '../fetcher';
 import CustomBox from '../custom/CustomBox';
+import { removeElement, replaceElement } from '../utils';
 
 export default function RulesView() {
 
-    const [nameVar, setName] = React.useState("")
     const [rules, setRules] = React.useState<any>([])
     const [variables, setVariables] = React.useState<any>([])
     const [premises, setPremises] = React.useState<any>([])
-    const [statementVariable, setStatementVariable] = React.useState<any>({})
+    const [statementVariable, setStatementVariable] = React.useState<any>('')
     const [statementValues, setStatementValues] = React.useState<any>([])
-    const [statementValue, setStatementValue] = React.useState<any>({})
+    const [statementValue, setStatementValue] = React.useState<any>('')
 
     const getPremise = (premise: any) => {
         return {
@@ -33,33 +33,18 @@ export default function RulesView() {
             variable_id: statementVariable.id
         }
         insert(rule, (json: any) => {
-            console.log('Response', json)
             fetchRules();
         })
     }
 
-    const fetchRules = () => {
-        listRules({}, (json: any) => {
-            setRules(json.data);
-        })
-    }
+    const fetchRules = () => { listRules((json: any) => { setRules(json.data); }) }
 
     const addPremise = () => {
         let subValue = { variable: {}, value: {} }
         setPremises(premises.concat(subValue))
     }
 
-    const removeValue = (index: number) => {
-        let clone = [...premises];
-        clone.splice(index, 1)
-        setPremises(clone)
-    }
-
-    const onChangeValue = (index: number, value: string) => {
-        let clone = [...premises];
-        clone[index] = { index: index, name: value }
-        setPremises(clone)
-    }
+    const removeValue = (index: number) => { setPremises(removeElement(premises, index)) }
 
     const onChangeVariable = (event: any) => {
         setStatementVariable(event.target.value)
@@ -71,10 +56,9 @@ export default function RulesView() {
     }
 
     const onChangePremiseVariable = (value: any, index: number) => {
-        let clone = [...premises];
-        clone[index] = { variable: value }
-        setPremises(clone)
+        setPremises(replaceElement(premises, index, { variable: value }))
     }
+
     const onChangePremiseValue = (value: any, index: number) => {
         let clone = [...premises];
         clone[index].value = value
@@ -83,10 +67,7 @@ export default function RulesView() {
 
     useEffect(() => {
         async function componentDidMount() {
-            list({
-                __type__: 'variable',
-                __relations__: [{ __relation_name__: 'options' }]
-            }, (json: any) => {
+            listVariables((json: any) => {
                 setVariables(json.data);
             })
             fetchRules()
@@ -95,9 +76,10 @@ export default function RulesView() {
     }, []);
 
     return (
-        <div style={{ display: 'flex', margin: 'auto' }}>
+        <React.Fragment>
             <CustomBox style={{ borderStyle: "solid", padding: '20px', borderWidth: '1px' }} >
                 <Select
+                    id="select-box"
                     value={statementVariable}
                     label="Variable"
                     onChange={onChangeVariable}
@@ -192,7 +174,7 @@ export default function RulesView() {
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.premises.map((p:any) => p.variable.name + ' -> ' + p.value.name ).join(', ')}</TableCell>
+                                    <TableCell>{row.premises.map((p: any) => p.variable.name + ' -> ' + p.value.name).join(', ')}</TableCell>
                                     <TableCell>{row.statement.variable.name + ' ==> ' + row.statement.value.name}</TableCell>
                                     <TableCell>Acciones</TableCell>
                                 </TableRow>
@@ -202,6 +184,6 @@ export default function RulesView() {
                 </TableContainer>
             </CustomBox>
 
-        </div>
+        </React.Fragment>
     );
 }

@@ -24,13 +24,15 @@ function App() {
             { to: "/calculator", label: 'Calculador' },
           ]}
         />
-        <Routes>
-          <Route path="/" element={<MainView />}></Route>
-          <Route path="/variable" element={<VariableView />}></Route>
-          <Route path="/rule" element={<RulesView />}></Route>
-          <Route path="/inference" element={<InferenceView />}></Route>
-          <Route path="/calculator" element={<Calculator />}></Route>
-        </Routes>
+        <div id="content-div" style={{ display: 'flex', margin: 'auto' }}>
+          <Routes>
+            <Route path="/" element={<MainView />}></Route>
+            <Route path="/variable" element={<VariableView />}></Route>
+            <Route path="/rule" element={<RulesView />}></Route>
+            <Route path="/inference" element={<InferenceView />}></Route>
+            <Route path="/calculator" element={<Calculator />}></Route>
+          </Routes>
+        </div>
       </Router>
     </div>
   );
