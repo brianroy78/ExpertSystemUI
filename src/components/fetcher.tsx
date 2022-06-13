@@ -14,6 +14,7 @@ function abstractFetch(path: string, obj: any, callback: Function) {
 }
 
 export function insert(obj: any, callback: Function) { return abstractFetch('/insert', obj, callback) }
+export function update(obj: any, callback: Function) { return abstractFetch('/update', obj, callback) }
 export function list(obj: any, callback: Function) { return abstractFetch('/list', obj, callback) }
 export function getRules(obj: any, callback: Function) { return abstractFetch('/inference/get/rules', obj, callback) }
 export function getVariable(obj: any, callback: Function) { return abstractFetch('/inference/get/variable', obj, callback) }

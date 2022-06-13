@@ -24,7 +24,7 @@ function App() {
             { to: "/calculator", label: 'Calculador' },
           ]}
         />
-        <div id="content-div" style={{ display: 'flex', margin: 'auto' }}>
+        <div id="content-div" style={{ display: 'flex', margin: 'auto', padding: '20px' }}>
           <Routes>
             <Route path="/" element={<MainView />}></Route>
             <Route path="/variable" element={<VariableView />}></Route>

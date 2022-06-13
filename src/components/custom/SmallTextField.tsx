@@ -2,20 +2,35 @@ import TextField from '@mui/material/TextField';
 import React, { useEffect } from 'react'
 
 export default function SmallTextField(props: any) {
-    const [fieldProps, setProps] = React.useState(props)
+
+    const { value, onChange, ...rest } = props;
+    const [cursor, setCursor] = React.useState(null);
+    const ref = React.useRef(null);
 
     useEffect(() => {
-        setProps(props);
-    }, [props]);
+        const input:any = ref.current;
+        if (input) {
+            input.setSelectionRange(cursor, cursor);
+        } 
+    }, [ref, cursor, value]);
+
+    const handleChange = (e:any) => {
+        setCursor(e.target.selectionStart);
+        onChange && onChange(e);
+     };
 
     return (
         <TextField
-            label={fieldProps.label || ''}
-            value={fieldProps.value}
             type='text'
-            onChange={fieldProps.onChange}
+            value={value}
+            onChange={handleChange}
+            onFocus={(e: any) => {
+                e.target.selectionStart = cursor;
+            }}
             size="small"
-            {...fieldProps}
+            style={{ width: '100%' }}
+            autoComplete='off'
+            {...rest}
         />
     )
 }
