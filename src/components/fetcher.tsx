@@ -21,6 +21,13 @@ export function getVariable(obj: any, callback: Function) { return abstractFetch
 export function inferenceRespond(obj: any, callback: Function) { return abstractFetch('/inference/respond', obj, callback) }
 export function parseFacts(obj: any, callback: Function) { return abstractFetch('/parse/facts', obj, callback) }
 
+
+export function insertVariable(obj: any, callback: Function) {
+    return abstractFetch(
+        '/insert', { ...obj, _type_: 'variable' }, callback
+    )
+}
+
 export function listVariables(callback: Function) {
     list({
         _type_: 'variable',
@@ -42,7 +49,7 @@ export function listRules(callback: Function) {
                 ]
             },
             {
-                _relation_name_: 'statement',
+                _relation_name_: 'conclusions',
                 _relations_: [
                     { _relation_name_: 'variable' },
                     { _relation_name_: 'value' },

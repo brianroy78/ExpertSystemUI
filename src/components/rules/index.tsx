@@ -13,29 +13,26 @@ export default function RulesView() {
     const [rules, setRules] = React.useState<any>([])
     const [variables, setVariables] = React.useState<any>([])
     const [premises, setPremises] = React.useState<any>([])
-    const [statementVariable, setStatementVariable] = React.useState<any>('')
-    const [statementValues, setStatementValues] = React.useState<any>([])
-    const [statementValue, setStatementValue] = React.useState<any>('')
+    const [conclusions, setConclusions] = React.useState<any>([])
+
+    // const [statementVariable, setStatementVariable] = React.useState<any>('')
+    // const [statementValues, setStatementValues] = React.useState<any>([])
+    // const [statementValue, setStatementValue] = React.useState<any>('')
 
     const [msg, setMsg] = React.useState<any>(null)
 
-    const getPremise = (premise: any) => {
+    const getFact = (premise: any) => {
         return {
-            __type__: 'fact',
+            _type_: 'fact',
             value_id: premise.value.id,
             variable_id: premise.variable.id
         }
     }
 
     const insertRule = () => {
-        let rule = { __type__: 'rule', premises: [], statement: {} }
-        let premisesReady = premises.map((value: any) => getPremise(value))
-        rule.premises = premisesReady
-        rule.statement = {
-            __type__: 'fact',
-            value_id: statementValue.id,
-            variable_id: statementVariable.id
-        }
+        let rule = { _type_: 'rule', premises: [], conclusions: {} }
+        rule.premises = premises.map((value: any) => getFact(value))
+        rule.conclusions = conclusions.map((conclusion: any) => getFact(conclusion))
         insert(rule, (json: any) => {
             fetchRules();
         })
@@ -48,25 +45,32 @@ export default function RulesView() {
         setPremises(premises.concat(subValue))
     }
 
+    const addConclusion = () => {
+        let subValue = { variable: {}, value: {} }
+        setConclusions(conclusions.concat(subValue))
+    }
+
     const removeValue = (index: number) => { setPremises(removeElement(premises, index)) }
-
-    const onChangeVariable = (event: any) => {
-        setStatementVariable(event.target.value)
-        setStatementValues(event.target.value.options)
-    }
-
-    const onChangeStatementValue = (event: any) => {
-        setStatementValue(event.target.value)
-    }
+    const removeConclusion = (index: number) => { setConclusions(removeElement(conclusions, index)) }
 
     const onChangePremiseVariable = (value: any, index: number) => {
         setPremises(replaceElement(premises, index, { variable: value }))
+    }
+
+    const onChangeConclusionVariable = (value: any, index: number) => {
+        setConclusions(replaceElement(conclusions, index, { variable: value }))
     }
 
     const onChangePremiseValue = (value: any, index: number) => {
         let clone = [...premises];
         clone[index].value = value
         setPremises(clone)
+    }
+
+    const onChangeConclusionValue = (value: any, index: number) => {
+        let clone = [...conclusions];
+        clone[index].value = value
+        setConclusions(clone)
     }
 
     useEffect(() => {
@@ -83,44 +87,72 @@ export default function RulesView() {
         <React.Fragment>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <CustomTypography>Variables</CustomTypography>
+                    <CustomTypography>Reglas</CustomTypography>
                     {(msg != null) ? <Alert variant="outlined" severity={msg.severity} onClose={() => { setMsg(null) }}>{msg.text}</Alert> : ''}
                 </Grid>
                 <Grid item xs={6}>
                     <Grid container spacing={2}>
-                        <Grid item xs={4}>
-                            <CustomSelect
-                                value={statementVariable}
-                                label="Variable"
-                                onChange={onChangeVariable}
-                            >
-                                {variables.map((variable: any, index: number) => (
-                                    <MenuItem key={index} value={variable}>{variable.name}</MenuItem>
-                                ))}
-                            </CustomSelect>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <CustomSelect
-                                value={statementValue}
-                                label="Value"
-                                onChange={onChangeStatementValue}
-                            >
-                                {statementValues.map((value: any, index: number) => (
-                                    <MenuItem key={index} value={value}>{value.name}</MenuItem>
-                                ))}
-                            </CustomSelect>
-                        </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={12}>
                             <SaveButton onClick={insertRule} />
                         </Grid>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
-                                <Typography variant="h6">Reglas</Typography>
                                 <Table aria-label="simple table" size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Variable</TableCell>
-                                            <TableCell>Value</TableCell>
+                                            <TableCell colSpan={2}>Conclusiones</TableCell>
+                                            <TableCell>
+                                                <AddButton onClick={addConclusion} />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {conclusions.map((row: any, index: number) => (
+                                            <TableRow
+                                                key={index}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row">
+                                                    <CustomSelect
+                                                        value={conclusions[index].variable}
+                                                        label="Variable"
+                                                        onChange={(event: any) => onChangeConclusionVariable(event.target.value, index)}
+                                                        fullWidth={true}
+                                                    >
+                                                        {variables.map((variable: any, index: number) => (
+                                                            <MenuItem key={index} value={variable}>{variable.name}</MenuItem>
+                                                        ))}
+                                                    </CustomSelect>
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    {Object.keys(conclusions[index].variable).length > 0 ? (
+                                                        <CustomSelect
+                                                            fullWidth={true}
+                                                            value={conclusions[index].value}
+                                                            label="Value"
+                                                            onChange={(event: any) => onChangeConclusionValue(event.target.value, index)}
+                                                        >
+                                                            {conclusions[index].variable.options.map((value: any, index: number) => (
+                                                                <MenuItem key={index} value={value}>{value.name}</MenuItem>
+                                                            ))}
+                                                        </CustomSelect>
+                                                    ) : ''}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <DeleteButton onClick={() => { removeConclusion(row.index) }} />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TableContainer component={Paper}>
+                                <Table aria-label="simple table" size="small">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell colSpan={2}>Premisas</TableCell>
                                             <TableCell>
                                                 <AddButton onClick={addPremise} />
                                             </TableCell>
@@ -189,7 +221,7 @@ export default function RulesView() {
                                     >
                                         <TableCell>{row.id}</TableCell>
                                         <TableCell>{row.premises.map((p: any) => p.variable.name + ' -> ' + p.value.name).join(', ')}</TableCell>
-                                        <TableCell>{row.statement.variable.name + ' ==> ' + row.statement.value.name}</TableCell>
+                                        <TableCell>{row.conclusions.map((p: any) => p.variable.name + ' -> ' + p.value.name).join(', ')}</TableCell>
                                         <TableCell>Acciones</TableCell>
                                     </TableRow>
                                 ))}

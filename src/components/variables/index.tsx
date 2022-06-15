@@ -11,7 +11,7 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material';
-import { insert, listVariables, update } from '../fetcher';
+import { insertVariable as sendVariable, listVariables, update } from '../fetcher';
 import SmallTextField from '../custom/SmallTextField';
 import { removeElement, replaceElement } from '../utils';
 import { AddButton, DeleteButton, SaveButton, EditButton } from '../custom/CustomButtons';
@@ -27,7 +27,7 @@ export default function VariableView() {
     const [editVar, setEditVar] = React.useState<any>(null)
 
     const getValue = (value: any) => {
-        return { __type__: 'value', name: value.name }
+        return { _type_: 'value', name: value.name }
     }
 
     function hasDuplicates(array: any) {
@@ -41,10 +41,10 @@ export default function VariableView() {
             return;
         }
 
-        let variable = { __type__: 'variable', name: nameVar, options: [] }
+        let variable = { name: nameVar, options: [] }
         let options = values.map((value: any) => getValue(value))
         variable['options'] = options
-        insert(variable, (json: any) => {
+        sendVariable(variable, (json: any) => {
             fetchVariables()
             setName("")
             setValues([])

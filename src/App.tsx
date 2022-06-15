@@ -10,8 +10,17 @@ import VariableView from './components/variables';
 import RulesView from './components/rules';
 import InferenceView from './components/inference';
 import Calculator from './components/calculator';
+import { useEffect } from 'react';
+import React from 'react';
 
-function App() {
+function App(props: any) {
+  const [AppProps, setProps] = React.useState(props)
+
+
+  useEffect(() => {
+    console.log('Props', window.location.href)
+  }, [props]);
+
   return (
     <div id='main-div'>
       <Router>
@@ -24,7 +33,7 @@ function App() {
             { to: "/calculator", label: 'Calculador' },
           ]}
         />
-        <div id="content-div" style={{ display: 'flex', margin: 'auto', padding: '20px' }}>
+        <div id="content-div" style={{ display: 'flex', margin: 'auto', padding: '20px', width: '100%' }}>
           <Routes>
             <Route path="/" element={<MainView />}></Route>
             <Route path="/variable" element={<VariableView />}></Route>
