@@ -1,44 +1,36 @@
 import { Button, Grid, Typography } from '@mui/material'
 import React, { useEffect } from 'react'
 import { CustomTypography } from '../custom/CustomTypographys'
-import { getRules, getVariable, inferenceRespond, parseFacts } from '../fetcher'
+import { getInferenceStart, inferenceRespond } from '../fetcher'
 
 export default function InferenceView() {
 
-    const [state, setState] = React.useState("")
     const [variable, setVariable] = React.useState<any>({})
     const [facts, setFacts] = React.useState<any>([])
+    const [sessionId, setSessionId] = React.useState<any>('')
 
-
-    const fetchRules = () => {
-        getRules({}, (json: any) => {
-            retrieveVariable(json.data)
-        })
-    }
 
     const respond = (valueId: any) => {
-        inferenceRespond({ state: state, value_id: valueId }, (json: any) => {
-            retrieveVariable(json.data)
-        })
-    }
-
-    const retrieveVariable = (state: any) => {
-        getVariable(state, (json: any) => {
-            setState(json.data.state)
-            if (json.data.hasOwnProperty('variable')) {
-                setVariable(json.data.variable)
+        inferenceRespond({ id: sessionId, value_id: valueId }, (json: any) => {
+            if (json.data.finished) {
+                setFacts(json.data.conclusions)
             } else {
-                setVariable({})
-                parseFacts(json.data.state, (factsResponse: any) => {
-                    setFacts(factsResponse.data)
-                })
+                setVariable(json.data.variable)
             }
         })
     }
 
     useEffect(() => {
         async function componentDidMount() {
-            fetchRules()
+            getInferenceStart({}, (json: any) => {
+                console.log('setting id', json.data.id)
+                setSessionId(json.data.id)
+                if (json.data.finished) {
+                    setFacts(json.data.conclusions)
+                } else {
+                    setVariable(json.data.variable)
+                }
+            })
         }
         componentDidMount()
     }, []);
