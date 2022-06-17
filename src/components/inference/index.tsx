@@ -1,35 +1,40 @@
-import { Button, Grid, Typography } from '@mui/material'
+import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect } from 'react'
-import { CustomTypography } from '../custom/CustomTypographys'
+import { EditButton } from '../custom/CustomButtons'
+import { CustomTypography, TableHeader } from '../custom/CustomTypographys'
 import { getInferenceStart, inferenceRespond } from '../fetcher'
+import ClientView from './ClientView'
+import './index.css';
 
 export default function InferenceView() {
 
     const [variable, setVariable] = React.useState<any>({})
-    const [facts, setFacts] = React.useState<any>([])
+    const [conclusions, setConclusions] = React.useState<any>([])
     const [sessionId, setSessionId] = React.useState<any>('')
+    const [userId, setUserId] = React.useState<any>(null)
+    const [isFinished, setIsFinished] = React.useState<any>(false)
 
 
     const respond = (valueId: any) => {
         inferenceRespond({ id: sessionId, value_id: valueId }, (json: any) => {
-            if (json.data.finished) {
-                setFacts(json.data.conclusions)
-            } else {
-                setVariable(json.data.variable)
-            }
+            analyze(json.data)
         })
+    }
+
+    const analyze = (data: any) => {
+        if (data.finished) {
+            setConclusions(data.conclusions)
+            setIsFinished(true)
+        } else {
+            setVariable(data.variable)
+        }
     }
 
     useEffect(() => {
         async function componentDidMount() {
             getInferenceStart({}, (json: any) => {
-                console.log('setting id', json.data.id)
                 setSessionId(json.data.id)
-                if (json.data.finished) {
-                    setFacts(json.data.conclusions)
-                } else {
-                    setVariable(json.data.variable)
-                }
+                analyze(json.data)
             })
         }
         componentDidMount()
@@ -37,48 +42,64 @@ export default function InferenceView() {
 
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12}><CustomTypography>Inferencia</CustomTypography></Grid>
-            {(Object.keys(variable).length > 0) ? (
-                <React.Fragment>
-                    <Grid item xs={12}>
-                        <Typography variant="h6">{variable.name}?</Typography>
+            {(userId === null) ? (<ClientView setUserId={setUserId} />) : (!isFinished) ? (
+                <Grid item xs={6}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <Typography className='var-typo' variant="h5">{variable.name}?</Typography>
+                        </Grid>
+                        {
+                            variable.options.map((option: any, index: any) => (
+                                <Grid item xs={12}>
+                                    <Button
+                                        key={index}
+                                        onClick={() => { respond(option.id) }}
+                                        variant='outlined'
+                                        style={{ width: '100%', margin: '10px' }}
+                                    >
+                                        {option.name}</Button>
+                                </Grid>
+                            ))
+                        }
+                        <Grid item xs={12}>
+                            <Button
+                                key="ignore-btn"
+                                onClick={() => { respond(null) }}
+                                variant='outlined'
+                                style={{ width: '100%', margin: '10px' }}
+                            >
+                                No se</Button>
+                        </Grid>
                     </Grid>
-                    {
-                        variable.options.map((option: any, index: any) => (
-                            <Grid item xs={12}>
-                                <Button
-                                    key={index}
-                                    onClick={() => { respond(option.id) }}
-                                    variant='outlined'
-                                    style={{ width: '100%', margin: '10px' }}
-                                >
-                                    {option.name}</Button>
-                            </Grid>
-                        ))
-                    }
-                    <Grid item xs={12}>
-                        <Button
-                            key="ignore-btn"
-                            onClick={() => { respond(null) }}
-                            variant='outlined'
-                            style={{ width: '100%', margin: '10px' }}
-                        >
-                            No se</Button>
-                    </Grid>
-                </React.Fragment>
-            ) : ''}
-            {(facts.length > 0) ? (
-                <Grid key='asdfasd' item xs={6}>
-                    {
-                        facts.map((fact: any, index: number) => (
-                            <Grid item xs={12}>
-                                <Typography key={index} variant='h6'>{fact}</Typography>
-                            </Grid>
-                        ))
-                    }
                 </Grid>
-            ) : ''}
+            ) : (
+                <Grid item xs={6}>
+                    <TableContainer component={Paper} style={{ padding: '20px' }}>
+                        <Table aria-label="simple table" size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><TableHeader>Nombre de la Variable</TableHeader></TableCell>
+                                    <TableCell><TableHeader>Nombre del Valor</TableHeader></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {conclusions.map((row: any, index: number) => (
+                                    <TableRow hover
+                                        key={index}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell>{row.variable_name}</TableCell>
+                                        <TableCell>{row.value_name}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Grid>
+
+            )}
         </Grid>
     );
 }

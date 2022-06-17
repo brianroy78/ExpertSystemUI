@@ -8,16 +8,16 @@ export default function SmallTextField(props: any) {
     const ref = React.useRef(null);
 
     useEffect(() => {
-        const input:any = ref.current;
+        const input: any = ref.current;
         if (input) {
             input.setSelectionRange(cursor, cursor);
-        } 
+        }
     }, [ref, cursor, value]);
 
-    const handleChange = (e:any) => {
+    const handleChange = (e: any) => {
         setCursor(e.target.selectionStart);
         onChange && onChange(e);
-     };
+    };
 
     return (
         <TextField
@@ -29,7 +29,7 @@ export default function SmallTextField(props: any) {
             }}
             size="small"
             style={{ width: '100%' }}
-            autoComplete='off'
+            autoComplete='new-password'
             {...rest}
         />
     )

@@ -11,3 +11,10 @@ export function replaceElement(array: Array<any>, index: number, element: any) {
     clone[index] = element
     return clone
 };
+
+export function update(obj: any, attribName: string, value: any) {
+    return 
+    let clone = {...obj}
+    clone[attribName] = value
+    return clone
+}

@@ -26,6 +26,21 @@ export function insertVariable(obj: any, callback: Function) {
     )
 }
 
+export function insertClient(obj: any, callback: Function) {
+    return abstractFetch(
+        '/insert', { ...obj, _type_: 'client' }, callback
+    )
+}
+
+export function listClients(callback: Function) {
+    list({
+        _type_: 'client'
+    }, (json: any) => {
+        callback(json)
+    })
+
+}
+
 export function listVariables(callback: Function) {
     list({
         _type_: 'variable',
