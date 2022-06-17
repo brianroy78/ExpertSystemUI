@@ -1,6 +1,5 @@
 import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect } from 'react'
-import { EditButton } from '../custom/CustomButtons'
 import { CustomTypography, TableHeader } from '../custom/CustomTypographys'
 import { getInferenceStart, inferenceRespond } from '../fetcher'
 import ClientView from './ClientView'
@@ -11,7 +10,7 @@ export default function InferenceView() {
     const [variable, setVariable] = React.useState<any>({})
     const [conclusions, setConclusions] = React.useState<any>([])
     const [sessionId, setSessionId] = React.useState<any>('')
-    const [userId, setUserId] = React.useState<any>(null)
+    const [clientId, setClientId] = React.useState<any>(null)
     const [isFinished, setIsFinished] = React.useState<any>(false)
 
 
@@ -29,6 +28,9 @@ export default function InferenceView() {
             setVariable(data.variable)
         }
     }
+    function capitalizeFirstLetter(word: string) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }
 
     useEffect(() => {
         async function componentDidMount() {
@@ -44,11 +46,11 @@ export default function InferenceView() {
     return (
         <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12}><CustomTypography>Inferencia</CustomTypography></Grid>
-            {(userId === null) ? (<ClientView setUserId={setUserId} />) : (!isFinished) ? (
+            {(clientId === null) ? (<ClientView setClientId={setClientId} />) : (!isFinished) ? (
                 <Grid item xs={6}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <Typography className='var-typo' variant="h5">{variable.name}?</Typography>
+                            <Typography className='var-typo' variant="h5">¿{capitalizeFirstLetter(variable.name)}?</Typography>
                         </Grid>
                         {
                             variable.options.map((option: any, index: any) => (
@@ -70,7 +72,7 @@ export default function InferenceView() {
                                 variant='outlined'
                                 style={{ width: '100%', margin: '10px' }}
                             >
-                                No se</Button>
+                                Saltar Pregunta</Button>
                         </Grid>
                     </Grid>
                 </Grid>

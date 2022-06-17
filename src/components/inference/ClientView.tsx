@@ -1,6 +1,5 @@
 import { Autocomplete, Button, Grid, Tab, Tabs, TextField } from "@mui/material";
 import React, { useEffect } from "react";
-import { CustomTypography } from "../custom/CustomTypographys";
 import SmallTextField from "../custom/SmallTextField";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { insertClient, listClients } from "../fetcher";
@@ -10,6 +9,7 @@ export default function ClientView(props: any) {
     const [value, setValue] = React.useState(0);
     const [clientViewProps, setClientViewProps] = React.useState(props)
     const [client, setClient] = React.useState({
+        id: null,
         name: '',
         last_name: '',
         phone_number: '',
@@ -25,12 +25,16 @@ export default function ClientView(props: any) {
 
     const createClient = () => {
         insertClient(client, (json: any) => {
-            clientViewProps.setUserId(json.data.id)
+            clientViewProps.setClientId(json.data.id)
         })
     }
 
-    const selectClient = (event: any, newValue: string | null) => {
-        clientViewProps.setUserId(newValue);
+    const selectClient = (event: any, newValue: any) => {
+        setClient(newValue)
+    }
+
+    const selectClientId = () => {
+        clientViewProps.setClientId(client.id)
     }
 
     useEffect(() => {
@@ -43,58 +47,14 @@ export default function ClientView(props: any) {
     return (
         <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12}>
-                <Tabs
-                    value={value} onChange={handleChange}
-                    centered>
+                <Tabs value={value} onChange={handleChange} centered>
                     <Tab label="Nuevo Cliente" value={0} />
                     <Tab label="Buscar Cliente" value={1} />
                 </Tabs>
             </Grid>
-            <Grid hidden={value != 0} item xs={4}>
+            <Grid item xs={4}>
                 <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Nombres"
-                            value={client.name}
-                            onChange={setName}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Apellidos"
-                            value={client.last_name}
-                            onChange={setLastName}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Número Telefónico"
-                            value={client.phone_number}
-                            onChange={setPhoneNumber}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Email"
-                            value={client.email}
-                            onChange={setEmail}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button
-                            variant="outlined"
-                            style={{ width: '100%' }}
-                            startIcon={<SaveOutlinedIcon />}
-                            onClick={createClient}
-                        >
-                            Guardar
-                        </Button >
-                    </Grid>
-                </Grid>
-            </Grid>
-            <Grid hidden={value != 1} item xs={4}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                    <Grid hidden={value !== 1} item xs={12}>
                         <Autocomplete
                             size="small"
                             style={{ width: '100%' }}
@@ -114,6 +74,58 @@ export default function ClientView(props: any) {
                             getOptionLabel={(option: any) => option.name + " " + option.last_name}
                             onChange={selectClient}
                         />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <SmallTextField
+                            label="Nombres"
+                            value={client.name}
+                            onChange={setName}
+                            disabled={value === 1}
+
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <SmallTextField
+                            label="Apellidos"
+                            value={client.last_name}
+                            onChange={setLastName}
+                            disabled={value === 1}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <SmallTextField
+                            label="Número Telefónico"
+                            value={client.phone_number}
+                            onChange={setPhoneNumber}
+                            disabled={value === 1}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <SmallTextField
+                            label="Email"
+                            value={client.email}
+                            onChange={setEmail}
+                            disabled={value === 1}
+                        />
+                    </Grid>
+                    <Grid hidden={value !== 0} item xs={12}>
+                        <Button
+                            variant="outlined"
+                            style={{ width: '100%' }}
+                            startIcon={<SaveOutlinedIcon />}
+                            onClick={createClient}
+                        >
+                            Guardar
+                        </Button >
+                    </Grid>
+                    <Grid hidden={value !== 1} item xs={12}>
+                        <Button
+                            variant="outlined"
+                            style={{ width: '100%' }}
+                            onClick={selectClientId}
+                        >
+                            Seleccionar
+                        </Button >
                     </Grid>
                 </Grid>
             </Grid>
