@@ -1,5 +1,5 @@
-import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
-import React, { useEffect } from 'react'
+import { Autocomplete, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import React, { Fragment, useEffect, useState } from 'react'
 import { CustomTypography, TableHeader } from '../custom/CustomTypographys'
 import { getInferenceStart, inferenceRespond } from '../fetcher'
 import ClientView from './ClientView'
@@ -7,11 +7,11 @@ import './index.css';
 
 export default function InferenceView() {
 
-    const [variable, setVariable] = React.useState<any>({})
-    const [conclusions, setConclusions] = React.useState<any>([])
-    const [sessionId, setSessionId] = React.useState<any>('')
-    const [clientId, setClientId] = React.useState<any>(null)
-    const [isFinished, setIsFinished] = React.useState<any>(false)
+    const [conclusions, setConclusions] = useState<any>([])
+    const [sessionId, setSessionId] = useState<any>('')
+    const [clientId, setClientId] = useState<any>(null)
+    const [isFinished, setIsFinished] = useState<any>(false)
+    const [variable, setVariable] = useState<any>(null)
 
 
     const respond = (valueId: any) => {
@@ -28,49 +28,74 @@ export default function InferenceView() {
             setVariable(data.variable)
         }
     }
+
     function capitalizeFirstLetter(word: string) {
         return word.charAt(0).toUpperCase() + word.slice(1);
     }
 
-    useEffect(() => {
-        async function componentDidMount() {
-            getInferenceStart({}, (json: any) => {
-                setSessionId(json.data.id)
-                analyze(json.data)
-            })
-        }
-        componentDidMount()
-    }, []);
+    function startInference(newClientId: any) {
+        setClientId(newClientId);
+        getInferenceStart({}, (json: any) => {
+            setSessionId(json.data.id)
+            analyze(json.data)
+        })
+    }
 
+    useEffect(() => { }, []);
 
     return (
         <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12}><CustomTypography>Inferencia</CustomTypography></Grid>
-            {(clientId === null) ? (<ClientView setClientId={setClientId} />) : (!isFinished) ? (
+            {(clientId === null) ? (<ClientView setClientId={startInference} />) : (!isFinished && variable !== null) ? (
                 <Grid item xs={6}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography className='var-typo' variant="h5">¿{capitalizeFirstLetter(variable.name)}?</Typography>
                         </Grid>
-                        {
-                            variable.options.map((option: any, index: any) => (
-                                <Grid item xs={12}>
-                                    <Button
-                                        key={index}
-                                        onClick={() => { respond(option.id) }}
-                                        variant='outlined'
-                                        style={{ width: '100%', margin: '10px' }}
-                                    >
-                                        {option.name}</Button>
-                                </Grid>
-                            ))
+                        {(variable.options.length < 5) ? (
+                            <Fragment>
+                                {
+                                    variable.options.map((option: any, index: any) => (
+                                        <Grid key={index} item xs={12}>
+                                            <Button
+                                                key={index}
+                                                onClick={() => { respond(option.id) }}
+                                                variant='outlined'
+                                                style={{ width: '100%' }}
+                                            >
+                                                {option.name}</Button>
+                                        </Grid>
+                                    ))
+                                }
+                            </Fragment>
+                        ) :
+                            <Grid item xs={12}>
+                                <Autocomplete
+                                    size="small"
+                                    sx={{ width: '100%' }}
+                                    disablePortal
+                                    options={variable.options}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Respuesta"
+                                            inputProps={{
+                                                ...params.inputProps,
+                                                autoComplete: 'new-password',
+                                            }}
+                                        />
+                                    )}
+                                    getOptionLabel={(option: any) => option.name}
+                                    onChange={(e: any, option: any) => { respond(option.id) }}
+                                />
+                            </Grid>
                         }
                         <Grid item xs={12}>
                             <Button
                                 key="ignore-btn"
                                 onClick={() => { respond(null) }}
                                 variant='outlined'
-                                style={{ width: '100%', margin: '10px' }}
+                                style={{ width: '100%' }}
                             >
                                 Saltar Pregunta</Button>
                         </Grid>

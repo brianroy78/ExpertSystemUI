@@ -48,4 +48,4 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## To Dos
 
-* Use Autocomplete component when the options are more than six
+* Factorize repetitive components

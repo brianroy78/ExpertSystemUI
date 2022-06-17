@@ -57,17 +57,16 @@ export default function ClientView(props: any) {
                     <Grid hidden={value !== 1} item xs={12}>
                         <Autocomplete
                             size="small"
-                            style={{ width: '100%' }}
                             disablePortal
                             options={clients}
-                            sx={{ width: 300 }}
+                            sx={{ width: '100%' }}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
                                     label="Nombres y Apellidos"
                                     inputProps={{
                                         ...params.inputProps,
-                                        autoComplete: 'new-password', // disable autocomplete and autofill
+                                        autoComplete: 'new-password',
                                     }}
                                 />
                             )}
