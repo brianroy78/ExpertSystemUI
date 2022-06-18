@@ -49,3 +49,4 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ## To Dos
 
 * Factorize repetitive components
+* Make the variables and rules views more usable and with more rules

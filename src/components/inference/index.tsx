@@ -55,7 +55,7 @@ export default function InferenceView() {
                         {(variable.options.length < 5) ? (
                             <Fragment>
                                 {
-                                    variable.options.map((option: any, index: any) => (
+                                    variable.options.sort((a: any, b: any) => a.order - b.order).map((option: any, index: any) => (
                                         <Grid key={index} item xs={12}>
                                             <Button
                                                 key={index}
