@@ -12,10 +12,15 @@ export default function InferenceView() {
     const [clientId, setClientId] = useState<any>(null)
     const [isFinished, setIsFinished] = useState<any>(false)
     const [variable, setVariable] = useState<any>(null)
+    const [autoValue, setAutoValue] = useState<any>(null)
+    const [autoHidden, setAutoHidden] = useState<any>(false)
 
 
-    const respond = (valueId: any) => {
-        inferenceRespond({ id: sessionId, value_id: valueId }, (json: any) => {
+    const respond = (value: any) => {
+        setAutoValue(null)
+        setAutoHidden(true)
+        inferenceRespond({ id: sessionId, value_name: value }, (json: any) => {
+            setAutoHidden(false)
             analyze(json.data)
         })
     }
@@ -41,7 +46,6 @@ export default function InferenceView() {
         })
     }
 
-    useEffect(() => { }, []);
 
     return (
         <Grid container spacing={2} justifyContent="center">
@@ -59,7 +63,7 @@ export default function InferenceView() {
                                         <Grid key={index} item xs={12}>
                                             <Button
                                                 key={index}
-                                                onClick={() => { respond(option.id) }}
+                                                onClick={() => { respond(option.name) }}
                                                 variant='outlined'
                                                 style={{ width: '100%' }}
                                             >
@@ -71,10 +75,13 @@ export default function InferenceView() {
                         ) :
                             <Grid item xs={12}>
                                 <Autocomplete
+                                    hidden={autoHidden}
                                     size="small"
                                     sx={{ width: '100%' }}
                                     disablePortal
                                     options={variable.options}
+                                    isOptionEqualToValue={(option: any, value: any) => option.name === value.name}
+                                    value={autoValue}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
@@ -86,7 +93,7 @@ export default function InferenceView() {
                                         />
                                     )}
                                     getOptionLabel={(option: any) => option.name}
-                                    onChange={(e: any, option: any) => { respond(option.id) }}
+                                    onChange={(e: any, option: any) => { respond(option.name) }}
                                 />
                             </Grid>
                         }
