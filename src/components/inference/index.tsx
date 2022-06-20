@@ -30,6 +30,8 @@ export default function InferenceView() {
             setConclusions(data.conclusions)
             setIsFinished(true)
         } else {
+            let sortedOptions = data.variable.options.sort((a: any, b: any) => a.order - b.order)
+            let skip = sortedOptions.pop()
             setVariable(data.variable)
         }
     }
@@ -49,7 +51,7 @@ export default function InferenceView() {
 
     return (
         <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12}><CustomTypography>Inferencia</CustomTypography></Grid>
+            <Grid item xs={12}><CustomTypography>Cotización/Diagnóstico</CustomTypography></Grid>
             {(clientId === null) ? (<ClientView setClientId={startInference} />) : (!isFinished && variable !== null) ? (
                 <Grid item xs={6}>
                     <Grid container spacing={2}>
@@ -100,7 +102,7 @@ export default function InferenceView() {
                         <Grid item xs={12}>
                             <Button
                                 key="ignore-btn"
-                                onClick={() => { respond(null) }}
+                                onClick={() => { respond('') }}
                                 variant='outlined'
                                 style={{ width: '100%' }}
                             >

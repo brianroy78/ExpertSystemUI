@@ -50,4 +50,4 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 * Factorize repetitive components
 * Make the variables and rules views more usable and with more rules
-* fix bug in inference view were if the same value apears in the next var is autoamtically selected in auto complete, reset/clear selected options
+* trigger the calculator view when it's needed and selected the correct value back in inference view
