@@ -18,7 +18,7 @@ export default function OptionsView(props_: any) {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
-                <Typography className='var-typo' variant="h5">¿{capitalizeFirstLetter(props.variable.name)}?</Typography>
+                <Typography className='var-typo' variant="h5">{props.variable.question}</Typography>
             </Grid>
             {(!props.variable.isScalar) ? (
                 <Fragment>
