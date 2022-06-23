@@ -35,9 +35,7 @@ export function insertClient(obj: any, callback: Function) {
 export function listClients(callback: Function) {
     list({
         _type_: 'client'
-    }, (json: any) => {
-        callback(json)
-    })
+    }, (json: any) => { callback(json) })
 
 }
 
@@ -45,9 +43,7 @@ export function listVariables(callback: Function) {
     list({
         _type_: 'variable',
         _relations_: [{ _relation_name_: 'options' }]
-    }, (json: any) => {
-        callback(json)
-    })
+    }, (json: any) => { callback(json) })
 }
 
 export function listRules(callback: Function) {
@@ -69,7 +65,12 @@ export function listRules(callback: Function) {
                 ]
             }
         ]
-    }, (json: any) => {
-        callback(json)
-    })
+    }, (json: any) => { callback(json) })
+}
+
+export function listDevices(callback: Function) {
+    list({
+        _type_: 'device',
+    }, (json: any) => { callback(json) })
+
 }

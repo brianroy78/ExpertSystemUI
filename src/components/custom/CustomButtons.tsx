@@ -2,6 +2,7 @@ import { Button, IconButton } from '@mui/material';
 import React, { useEffect } from 'react'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
@@ -78,7 +79,7 @@ export function DeleteButton(props: any) {
             style={{ width: '100%' }}
             {...btnProps}
         >
-            <DeleteOutlinedIcon />
+            <DeleteIcon />
         </IconButton>
     )
 }

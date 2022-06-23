@@ -6,11 +6,6 @@ export default function OptionsView(props_: any) {
     const [props, setProps] = React.useState(props_)
     const [scalarValue, setScalarValue] = React.useState(.0)
 
-
-    function capitalizeFirstLetter(word: string) {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-    }
-
     const onScalarValueChange = (event: any) => { setScalarValue(event.target.value) }
 
     useEffect(() => { setProps(props_); }, [props_]);
@@ -70,6 +65,8 @@ export default function OptionsView(props_: any) {
                         <SmallTextField
                             value={scalarValue}
                             onChange={onScalarValueChange}
+                            type="number" 
+                            step="0.1"
                         />
                     </Grid>
                     <Grid item xs={4}>
