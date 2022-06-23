@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { Autocomplete, Button, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Autocomplete, Button, Grid, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import SmallTextField from '../custom/SmallTextField';
 import { listDevices } from '../fetcher';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
 
 export default function Calculator() {
 
@@ -67,7 +70,7 @@ export default function Calculator() {
     useEffect(() => {
         let categories_ = allDevices.map((d: any) => d.category).sort()
         categories_ = categories_.filter(function (item: any, pos: any) {
-            return categories_.indexOf(item) == pos;
+            return categories_.indexOf(item) === pos;
         })
         categories_ = categories_
         setCategories(categories_)
@@ -85,7 +88,7 @@ export default function Calculator() {
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label="Categoría"
+                            label="Categoría*"
                             inputProps={{
                                 ...params.inputProps,
                                 autoComplete: 'new-password',
@@ -107,7 +110,7 @@ export default function Calculator() {
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label="Equipo"
+                            label="Equipo*"
                             inputProps={{
                                 ...params.inputProps,
                                 autoComplete: 'new-password',
@@ -120,7 +123,7 @@ export default function Calculator() {
             </Grid>
             <Grid item xs={2}>
                 <SmallTextField
-                    label="Cantidad"
+                    label="Cantidad*"
                     value={quantity}
                     onChange={onQuantityChange}
                     step="1"
@@ -128,7 +131,7 @@ export default function Calculator() {
             </Grid>
             <Grid item xs={2}>
                 <SmallTextField
-                    label="Tiempo de uso (hrs)"
+                    label="Tiempo de uso (hrs)*"
                     value={usageTime}
                     onChange={onUsageTimeChange}
                     step="1"
@@ -136,12 +139,15 @@ export default function Calculator() {
             </Grid>
             <Grid item xs={2}>
                 <Button
+                    disabled={device == null}
                     key="scalar-btn"
                     onClick={addDevice}
                     variant='outlined'
                     style={{ width: '100%' }}
                 >
                     Agregar</Button>
+
+
             </Grid>
             <Grid>
                 <Typography variant="h6" style={{ display: ' inline-block' }}>Consumo Total: {calc()} KWh</Typography>
@@ -175,7 +181,13 @@ export default function Calculator() {
                                     <TableCell>{row.quantity}</TableCell>
                                     <TableCell>{row.time}</TableCell>
                                     <TableCell>
-                                        <Button onClick={() => { removeDevice(index) }}>Quitar</Button>
+                                        <IconButton
+                                            color="error"
+                                            size="small"
+                                            onClick={() => { removeDevice(index) }}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
