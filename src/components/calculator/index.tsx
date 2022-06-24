@@ -5,21 +5,19 @@ import Paper from '@mui/material/Paper';
 import SmallTextField from '../custom/SmallTextField';
 import { listDevices } from '../fetcher';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 
-export default function Calculator() {
+export default function Calculator(props_: any) {
 
-
+    const [props, setProps] = React.useState(props_)
     const [selectedDevices, setSelectedDevices] = React.useState<any>([])
     const [allDevices, setAllDevices] = React.useState<any>([])
     const [devices, setDevices] = React.useState<any>([])
+    const [device, setDevice] = React.useState<any>(null)
     const [usageTime, setUsageTime] = React.useState<any>(1)
     const [quantity, setQuantity] = React.useState<any>(1)
     const [categories, setCategories] = React.useState<any>([])
     const [category, setCategory] = React.useState<any>(null)
-    const [inputvalue, setInputvalue] = React.useState<any>('')
-    const [device, setDevice] = React.useState<any>(null)
 
 
     const removeDevice = (index: number) => {
@@ -28,25 +26,26 @@ export default function Calculator() {
         setSelectedDevices(clone)
     }
 
-    const onUsageTimeChange = (event: any) => {
-        setUsageTime(event.target.value)
-    }
-
-    const onQuantityChange = (event: any) => {
-        setQuantity(event.target.value)
-    }
+    const onUsageTimeChange = (event: any) => { setUsageTime(event.target.value) }
+    const onQuantityChange = (event: any) => { setQuantity(event.target.value) }
+    const onDeviceSelect = (e: any, device: any) => { setDevice(device) }
 
     const calc = () => {
-        let energies = selectedDevices.map((h: any) => h.consumption * h.time)
+        let energies = selectedDevices.map((d: any) => d.rated_power * d.time * d.quantity)
         return energies.reduce((a: any, b: any) => a + b, 0) / 1000
     }
 
-    const onDeviceSelect = (e: any, device: any) => {
-        setDevice(device)
-    }
-
     const addDevice = () => {
-        setSelectedDevices([...selectedDevices, { ...device, time: usageTime, quantity }])
+        setSelectedDevices(
+            [...selectedDevices, { ...device, time: usageTime, quantity }].sort(
+                (a: any, b: any) => a.category.localeCompare(b.category) ||
+                    a.rated_power - b.rated_power ||
+                    a.bootstrap_factor - b.bootstrap_factor ||
+                    a.quantity - b.quantity ||
+                    a.time - b.time
+            )
+
+        )
         setCategory(null)
         setDevices([])
         setDevice(null)
@@ -56,28 +55,46 @@ export default function Calculator() {
 
     const onCategoryChange = (e: any, category: string) => {
         setCategory(category)
-        let subDevices = allDevices.filter((d: any) => d.category === category).sort();
-        setDevices(subDevices)
+        setDevices(allDevices.filter((d: any) => d.category === category).sort())
+        setDevice(null)
+    }
+
+    const respond = () => {
+        props.respond(calc())
     }
 
     useEffect(() => {
         listDevices((json: any) => {
             setAllDevices(json.data)
-
         })
-    }, []);
+        setProps(props_);
+    }, [props_]);
 
     useEffect(() => {
         let categories_ = allDevices.map((d: any) => d.category).sort()
-        categories_ = categories_.filter(function (item: any, pos: any) {
-            return categories_.indexOf(item) === pos;
-        })
+        categories_ = categories_.filter((i: any, p: number) => categories_.indexOf(i) == p)
         categories_ = categories_
         setCategories(categories_)
     }, [allDevices])
 
     return (
-        <Grid container spacing={4} justifyContent="center" columns={13}>
+        <Grid
+            container spacing={4}
+            justifyContent="center"
+            columns={13}>
+            <Grid item xs={11}>
+                <Typography variant="h6" style={{ textAlign: 'center' }}>Consumo Total: {calc()} KWh</Typography>
+            </Grid>
+            <Grid item xs={2}>
+                <Button
+                    disabled={selectedDevices.length < 1}
+                    key="scalar-btn"
+                    onClick={respond}
+                    variant='outlined'
+                    style={{ width: '100%' }}
+                >
+                    Responder</Button>
+            </Grid>
             <Grid item xs={3}>
                 <Autocomplete
                     size="small"
@@ -131,7 +148,7 @@ export default function Calculator() {
             </Grid>
             <Grid item xs={2}>
                 <SmallTextField
-                    label="Tiempo de uso (hrs)*"
+                    label="Tiempo(hrs)*"
                     value={usageTime}
                     onChange={onUsageTimeChange}
                     step="1"
@@ -146,11 +163,6 @@ export default function Calculator() {
                     style={{ width: '100%' }}
                 >
                     Agregar</Button>
-
-
-            </Grid>
-            <Grid>
-                <Typography variant="h6" style={{ display: ' inline-block' }}>Consumo Total: {calc()} KWh</Typography>
             </Grid>
             <Grid item xs={13}>
                 <TableContainer component={Paper} style={{ width: '100%' }}>
