@@ -1,17 +1,14 @@
-import './App.css';
-import SideMenu from './components/menu/menu';
+import { Grid } from '@mui/material';
+import React, { useEffect } from 'react';
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route
+  BrowserRouter as Router, Route, Routes
 } from "react-router-dom";
-import MainView from './components/main/main';
-import VariableView from './components/variables';
-import RulesView from './components/rules';
+import './App.css';
 import InferenceView from './components/inference';
-import Calculator from './components/calculator';
-import { useEffect } from 'react';
-import React from 'react';
+import MainView from './components/main/main';
+import SideMenu from './components/menu/menu';
+import RulesView from './components/rules';
+import VariableView from './components/variables';
 
 function App(props: any) {
   const [AppProps, setProps] = React.useState(props)
@@ -22,28 +19,36 @@ function App(props: any) {
   }, [props]);
 
   return (
-    <div id='main-div'>
-      <Router>
-        <SideMenu
-          links={[
-            { to: "/", label: 'Home' },
-            { to: "/variable", label: 'Variables' },
-            { to: "/rule", label: 'Reglas' },
-            { to: "/inference", label: 'Inferencia' },
-            { to: "/calculator", label: 'Calculador' },
-          ]}
-        />
-        <div id="content-div" style={{ display: 'flex', margin: 'auto', padding: '20px', width: '100%' }}>
+    <Router>
+      <Grid
+        container
+        spacing={4}
+        justifyContent="space-evenly"
+      >
+        <Grid item xs={12}>
+          <div id='top-bar' style={{ height: '80px' }}></div>
+        </Grid>
+        <Grid item xs={2}>
+          <SideMenu
+            links={[
+              { to: "/", label: 'Home' },
+              { to: "/variable", label: 'Variables' },
+              { to: "/rule", label: 'Reglas' },
+              { to: "/inference", label: 'Cotización' },
+            ]}
+          />
+        </Grid>
+
+        <Grid item xs={10}>
           <Routes>
             <Route path="/" element={<MainView />}></Route>
             <Route path="/variable" element={<VariableView />}></Route>
             <Route path="/rule" element={<RulesView />}></Route>
             <Route path="/inference" element={<InferenceView />}></Route>
-            <Route path="/calculator" element={<Calculator />}></Route>
           </Routes>
-        </div>
-      </Router>
-    </div>
+        </Grid>
+      </Grid>
+    </Router>
   );
 }
 

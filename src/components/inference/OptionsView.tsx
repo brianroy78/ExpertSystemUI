@@ -6,10 +6,7 @@ export default function OptionsView(props_: any) {
 
     const [props, setProps] = useState(props_)
     const [scalarValue, setScalarValue] = useState(.0)
-
     const onScalarValueChange = (event: any) => { setScalarValue(event.target.value) }
-
-
 
     useEffect(() => {
         setProps(props_);
@@ -71,8 +68,6 @@ export default function OptionsView(props_: any) {
                             <SmallTextField
                                 value={scalarValue}
                                 onChange={onScalarValueChange}
-                                type="number"
-                                step="0.1"
                             />
                         </Grid>
                         <Grid item xs={4}>

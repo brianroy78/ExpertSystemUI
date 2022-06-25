@@ -2,21 +2,25 @@ import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Ta
 import { Fragment, useState } from 'react'
 import Calculator from '../calculator'
 import { CustomTypography, TableHeader } from '../custom/CustomTypographys'
-import { getInferenceStart, inferenceRespond } from '../fetcher'
+import { startQuotation, inferenceRespond, insertQuotation, listQuotation } from '../fetcher'
 import ClientView from './ClientView'
-import './index.css'
+import ConclusionsView from './ConclusionsView'
 import OptionsView from './OptionsView'
+import QuotationsView from './QuotationsView'
 
 export default function InferenceView() {
-
-    const [conclusions, setConclusions] = useState<any>([])
-    const [sessionId, setSessionId] = useState<any>('')
-    const [clientId, setClientId] = useState<any>(null)
-    const [isFinished, setIsFinished] = useState<any>(false)
-    const [variable, setVariable] = useState<any>(null)
     const [autoValue, setAutoValue] = useState<any>(null)
     const [autoHidden, setAutoHidden] = useState<any>(false)
+
+    const [conclusions, setConclusions] = useState<any>([])
+    const [clientId, setClientId] = useState<any>(null)
+    const [variable, setVariable] = useState<any>(null)
     const [doCalc, setDoCalc] = useState(false)
+    const [quotations, setQuotations] = useState([])
+    const [quotation, setQuotation] = useState(null)
+
+    const [sessionId, setSessionId] = useState(null)
+    const [step, setStep] = useState(0)
 
 
     const respond = (value: any) => {
@@ -30,8 +34,8 @@ export default function InferenceView() {
 
     const analyze = (data: any) => {
         if (data.finished) {
+            setStep(3)
             setConclusions(data.conclusions)
-            setIsFinished(true)
         } else {
             let sortedOptions = data.variable.options.sort((a: any, b: any) => a.order - b.order)
             let skip = sortedOptions.pop()
@@ -39,12 +43,15 @@ export default function InferenceView() {
         }
     }
 
-    function startInference(newClientId: any) {
-        setClientId(newClientId);
-        getInferenceStart({}, (json: any) => {
-            setSessionId(json.data.id)
-            analyze(json.data)
-        })
+    function selectQuotation(clientId: any) {
+        setClientId(clientId);
+        setStep(1)
+    }
+
+    function startQuotation(data: any) {
+        setSessionId(data.id)
+        analyze(data)
+        setStep(2)
     }
 
     const calcRespond = (response: any) => {
@@ -53,11 +60,17 @@ export default function InferenceView() {
     }
 
     return (
-        <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12}><CustomTypography>Cotización/Diagnóstico</CustomTypography></Grid>
+        <Grid
+            container
+            spacing={4}
+            justifyContent="space-evenly"
+        >
+            <Grid item xs={12}><CustomTypography>Cotización</CustomTypography></Grid>
             {(!doCalc) ?
                 <Fragment>
-                    {(clientId === null) ? (<ClientView setClientId={startInference} />) : (!isFinished && variable !== null) ? (
+                    {(step === 0) ? (<ClientView setClientId={selectQuotation} />) : ''}
+                    {(step === 1) ? (<QuotationsView clientId={clientId} startQuotation={startQuotation} />) : ''}
+                    {(step === 2) ? (
                         <Grid item xs={6}>
                             <OptionsView
                                 variable={variable}
@@ -67,33 +80,13 @@ export default function InferenceView() {
                                 setDoCalc={setDoCalc}
                             />
                         </Grid>
-                    ) : (
-                        <Grid item xs={6}>
-                            <TableContainer component={Paper} style={{ padding: '20px' }}>
-                                <Table aria-label="simple table" size="small">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell><TableHeader>Nombre de la Variable</TableHeader></TableCell>
-                                            <TableCell><TableHeader>Nombre del Valor</TableHeader></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {conclusions.map((row: any, index: number) => (
-                                            <TableRow hover
-                                                key={index}
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                            >
-                                                <TableCell>{row.variable_name}</TableCell>
-                                                <TableCell>{row.value_name}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Grid>
-                    )}
+                    ) : ''}
+
+                    {(step === 3) ? (<ConclusionsView conclusions={conclusions} />) : ''}
                 </Fragment> :
-                <Calculator respond={calcRespond} />
+                <Grid item xs={11}>
+                    <Calculator respond={calcRespond} />
+                </Grid>
             }
         </Grid>
     );

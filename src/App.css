@@ -1,8 +1,7 @@
-html, body, #root {
+html,
+body,
+#root {
   min-height: 100%;
-}
-
-body {
 }
 
 .App {
@@ -16,11 +15,6 @@ body {
   padding: 10px;
 }
 
-#main-div {
-  max-width: 1264px;
-  width: 100%;
-  background: none;
-  display: flex;
-  justify-content: space-between;
-  margin: 0 auto
+#top-bar {
+  background-color: rgb(10, 25, 41);
 }
