@@ -1,3 +1,4 @@
+import { Grid } from '@mui/material';
 import * as React from 'react';
 
 
@@ -9,10 +10,14 @@ export default function MainView() {
   };
 
   return (
-    <React.Fragment>
-      <div style={{ display: 'flex', margin: 'auto' }}>
-        <h1>Main View!!!!!</h1>
-      </div>
-    </React.Fragment>
+    <Grid
+      container
+      spacing={4}
+      justifyContent="space-evenly"
+    >
+      <Grid>
+        <h2>Bienvenido al sistema de cotización de paneles solares!</h2>
+      </Grid>
+    </Grid>
   );
 }

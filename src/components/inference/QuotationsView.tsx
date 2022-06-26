@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { TableHeader } from "../custom/CustomTypographys";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -89,7 +89,9 @@ export default function QuotationsView(inputProps: any) {
                                 <Table size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell><TableHeader>Cotizaciones Anteriores</TableHeader></TableCell>
+                                            <TableCell style={{textAlign: 'center'}}>
+                                                <TableHeader>Cotizaciones Anteriores</TableHeader>
+                                                </TableCell>
                                             <TableCell><TableHeader>
                                                 <Button
                                                     key="new-quotation-btn"
@@ -104,29 +106,37 @@ export default function QuotationsView(inputProps: any) {
                                     <TableBody>
                                         {quotations.map((q: any, index: number) => (
                                             <TableRow hover key={index}>
-                                                <TableCell>{q.creation_datetime.substring(0, 19)}</TableCell>
-                                                <TableCell>
-                                                    <IconButton
-                                                        color="warning"
-                                                        size="small"
-                                                        onClick={() => { updateQuotation(q) }}
-                                                    >
-                                                        <EditIcon />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="primary"
-                                                        size="small"
-                                                        onClick={() => { cloneQuotation(q) }}
-                                                    >
-                                                        <FileCopyIcon />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="error"
-                                                        size="small"
-                                                        onClick={() => { deleteQuotation(q) }}
-                                                    >
-                                                        <DeleteIcon />
-                                                    </IconButton>
+                                                <TableCell style={{ textAlign: 'center' }}>
+                                                    {q.creation_datetime.substring(0, 19)}
+                                                </TableCell>
+                                                <TableCell style={{ textAlign: 'center' }}>
+                                                    <Tooltip title="Actualizar">
+                                                        <IconButton
+                                                            color="warning"
+                                                            size="small"
+                                                            onClick={() => { updateQuotation(q) }}
+                                                        >
+                                                            <EditIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="Clonar">
+                                                        <IconButton
+                                                            color="primary"
+                                                            size="small"
+                                                            onClick={() => { cloneQuotation(q) }}
+                                                        >
+                                                            <FileCopyIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="Eliminar">
+                                                        <IconButton
+                                                            color="error"
+                                                            size="small"
+                                                            onClick={() => { deleteQuotation(q) }}
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

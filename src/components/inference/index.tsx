@@ -1,8 +1,8 @@
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 import { Fragment, useState } from 'react'
 import Calculator from '../calculator'
-import { CustomTypography, TableHeader } from '../custom/CustomTypographys'
-import { startQuotation, inferenceRespond, insertQuotation, listQuotation } from '../fetcher'
+import { CustomTypography } from '../custom/CustomTypographys'
+import { inferenceRespond } from '../fetcher'
 import ClientView from './ClientView'
 import ConclusionsView from './ConclusionsView'
 import OptionsView from './OptionsView'
@@ -13,11 +13,9 @@ export default function InferenceView() {
     const [autoHidden, setAutoHidden] = useState<any>(false)
 
     const [conclusions, setConclusions] = useState<any>([])
-    const [clientId, setClientId] = useState<any>(null)
+    const [client, setClient] = useState<any>(null)
     const [variable, setVariable] = useState<any>(null)
     const [doCalc, setDoCalc] = useState(false)
-    const [quotations, setQuotations] = useState([])
-    const [quotation, setQuotation] = useState(null)
 
     const [sessionId, setSessionId] = useState(null)
     const [step, setStep] = useState(0)
@@ -38,13 +36,13 @@ export default function InferenceView() {
             setConclusions(data.conclusions)
         } else {
             let sortedOptions = data.variable.options.sort((a: any, b: any) => a.order - b.order)
-            let skip = sortedOptions.pop()
+            sortedOptions.pop()
             setVariable(data.variable)
         }
     }
 
-    function selectQuotation(clientId: any) {
-        setClientId(clientId);
+    function selectQuotation(client: any) {
+        setClient(client);
         setStep(1)
     }
 
@@ -66,10 +64,14 @@ export default function InferenceView() {
             justifyContent="space-evenly"
         >
             <Grid item xs={12}><CustomTypography>Cotización</CustomTypography></Grid>
+            {(client != null) ? (<Grid item xs={12}><Typography
+                style={{ textAlign: 'center' }}
+                variant="h6"
+            >Cliente: {client.name} {client.last_name} </Typography></Grid>) : ''}
             {(!doCalc) ?
                 <Fragment>
                     {(step === 0) ? (<ClientView setClientId={selectQuotation} />) : ''}
-                    {(step === 1) ? (<QuotationsView clientId={clientId} startQuotation={startQuotation} />) : ''}
+                    {(step === 1) ? (<QuotationsView clientId={client.id} startQuotation={startQuotation} />) : ''}
                     {(step === 2) ? (
                         <Grid item xs={6}>
                             <OptionsView

@@ -2,6 +2,7 @@ import { Autocomplete, Button, Grid, Tab, Tabs, TextField } from "@mui/material"
 import React, { useEffect } from "react";
 import SmallTextField from "../custom/SmallTextField";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import CheckIcon from '@mui/icons-material/Check';
 import { insertClient, listClients } from "../fetcher";
 
 
@@ -16,6 +17,7 @@ export default function ClientView(props: any) {
         email: ''
     })
     const [clients, setClients] = React.useState<any>([])
+    const [selectedClient, setSelectedClient] = React.useState<any>(null)
 
     const handleChange = (e: any, index: number) => { setValue(index); };
     const setName = (e: any) => { setClient({ ...client, name: e.target.value }) }
@@ -25,16 +27,21 @@ export default function ClientView(props: any) {
 
     const createClient = () => {
         insertClient(client, (json: any) => {
-            clientViewProps.setClientId(json.data.id)
+            clientViewProps.setClientId({ ...client, id: json.data.id })
         })
     }
 
-    const selectClient = (event: any, newValue: any) => {
-        setClient(newValue)
-    }
+    const selectClient = (event: any, newValue: any) => { setClient(newValue) }
+    const selectClientId = () => { clientViewProps.setClientId(client) }
 
-    const selectClientId = () => {
-        clientViewProps.setClientId(client.id)
+    const clear = () => {
+        setClient({
+            id: null,
+            name: '',
+            last_name: '',
+            phone_number: '',
+            email: ''
+        })
     }
 
     useEffect(() => {
@@ -48,8 +55,8 @@ export default function ClientView(props: any) {
         <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12}>
                 <Tabs value={value} onChange={handleChange} centered>
-                    <Tab label="Nuevo Cliente" value={0} />
-                    <Tab label="Buscar Cliente" value={1} />
+                    <Tab label="Nuevo Cliente" value={0} onClick={clear} />
+                    <Tab label="Buscar Cliente" value={1} onClick={clear} />
                 </Tabs>
             </Grid>
             <Grid item xs={4}>
@@ -59,6 +66,7 @@ export default function ClientView(props: any) {
                             size="small"
                             disablePortal
                             options={clients}
+                            value={selectedClient || null}
                             sx={{ width: '100%' }}
                             renderInput={(params) => (
                                 <TextField
@@ -111,7 +119,7 @@ export default function ClientView(props: any) {
                         <Button
                             variant="outlined"
                             style={{ width: '100%' }}
-                            startIcon={<SaveOutlinedIcon />}
+                            endIcon={<SaveOutlinedIcon />}
                             onClick={createClient}
                         >
                             Guardar
@@ -119,8 +127,10 @@ export default function ClientView(props: any) {
                     </Grid>
                     <Grid hidden={value !== 1} item xs={12}>
                         <Button
+                            disabled={client.id == null}
                             variant="outlined"
                             style={{ width: '100%' }}
+                            endIcon={<CheckIcon />}
                             onClick={selectClientId}
                         >
                             Seleccionar

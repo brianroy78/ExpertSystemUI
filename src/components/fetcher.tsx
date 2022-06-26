@@ -76,7 +76,6 @@ export function deleteQuotationById(id: any, callback: Function) {
 }
 
 export function listSelectedOptions(quotationId: any, callback: Function) {
-    console.log('quotationId',quotationId)
     list({
         _type_: 'selected_option',
         _filters_: [
