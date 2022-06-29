@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Autocomplete, Button, Grid, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import SmallTextField from '../custom/SmallTextField';
 import { listDevices } from '../fetcher';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 
 export default function Calculator(props_: any) {
@@ -72,99 +72,98 @@ export default function Calculator(props_: any) {
 
     useEffect(() => {
         let categories_ = allDevices.map((d: any) => d.category).sort()
-        categories_ = categories_.filter((i: any, p: number) => categories_.indexOf(i) == p)
-        categories_ = categories_
+        categories_ = categories_.filter((i: any, p: number) => categories_.indexOf(i) === p)
         setCategories(categories_)
     }, [allDevices])
 
     return (
-        <Grid
-            container spacing={2}
-            justifyContent="center">
-            <Grid item xs={12}>
-                <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                        <Typography variant="h6" style={{ textAlign: 'center' }}>Consumo Total: {calc()} KWh</Typography>
+        <Fragment>
+            <Grid container>
+                <Grid item xs={12}>
+                    <Grid container justifyContent="center">
+                        <Grid item xs={4}>
+                            <Typography variant="h6" style={{ textAlign: 'center' }}>Consumo Total: {calc()} KWh</Typography>
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button
+                                disabled={selectedDevices.length < 1}
+                                key="scalar-btn"
+                                onClick={respond}
+                                variant='outlined'
+                                style={{ width: '100%' }}
+                            >
+                                Responder</Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                        <Button
-                            disabled={selectedDevices.length < 1}
-                            key="scalar-btn"
-                            onClick={respond}
-                            variant='outlined'
-                            style={{ width: '100%' }}
-                        >
-                            Responder</Button>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Autocomplete
-                            size="small"
-                            sx={{ width: '100%' }}
-                            disablePortal
-                            options={categories}
-                            value={category || null}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Categoría*"
-                                    inputProps={{
-                                        ...params.inputProps,
-                                        autoComplete: 'new-password',
-                                    }}
-                                />
-                            )}
-                            getOptionLabel={(option: any) => option}
-                            onChange={onCategoryChange}
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Autocomplete
-                            size="small"
-                            sx={{ width: '100%' }}
-                            disablePortal
-                            options={devices}
-                            isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
-                            value={device || null}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Equipo*"
-                                    inputProps={{
-                                        ...params.inputProps,
-                                        autoComplete: 'new-password',
-                                    }}
-                                />
-                            )}
-                            getOptionLabel={(option: any) => option.name}
-                            onChange={onDeviceSelect}
-                        />
-                    </Grid>
-                    <Grid item xs={4}>
-                        <SmallTextField
-                            label="Cantidad*"
-                            value={quantity}
-                            onChange={onQuantityChange}
-                            step="1"
-                        />
-                    </Grid>
-                    <Grid item xs={4}>
-                        <SmallTextField
-                            label="Tiempo(hrs)*"
-                            value={usageTime}
-                            onChange={onUsageTimeChange}
-                            step="1"
-                        />
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Button
-                            disabled={device == null}
-                            key="scalar-btn"
-                            onClick={addDevice}
-                            variant='outlined'
-                            style={{ width: '100%' }}
-                        >
-                            Agregar</Button>
-                    </Grid>
+                </Grid>
+                <Grid item xs={6}>
+                    <Autocomplete
+                        size="small"
+                        sx={{ width: '100%' }}
+                        disablePortal
+                        options={categories}
+                        value={category || null}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Categoría*"
+                                inputProps={{
+                                    ...params.inputProps,
+                                    autoComplete: 'new-password',
+                                }}
+                            />
+                        )}
+                        getOptionLabel={(option: any) => option}
+                        onChange={onCategoryChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <Autocomplete
+                        size="small"
+                        sx={{ width: '100%' }}
+                        disablePortal
+                        options={devices}
+                        isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
+                        value={device || null}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Equipo*"
+                                inputProps={{
+                                    ...params.inputProps,
+                                    autoComplete: 'new-password',
+                                }}
+                            />
+                        )}
+                        getOptionLabel={(option: any) => option.name}
+                        onChange={onDeviceSelect}
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    <SmallTextField
+                        label="Cantidad*"
+                        value={quantity}
+                        onChange={onQuantityChange}
+                        step="1"
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    <SmallTextField
+                        label="Tiempo(hrs)*"
+                        value={usageTime}
+                        onChange={onUsageTimeChange}
+                        step="1"
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    <Button
+                        disabled={device == null}
+                        key="scalar-btn"
+                        onClick={addDevice}
+                        variant='outlined'
+                        style={{ width: '100%' }}
+                    >
+                        Agregar</Button>
                 </Grid>
             </Grid>
             <Grid item xs={12}>
@@ -210,6 +209,6 @@ export default function Calculator(props_: any) {
                     </Table>
                 </TableContainer>
             </Grid>
-        </Grid >
+        </Fragment>
     );
 }

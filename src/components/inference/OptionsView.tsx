@@ -1,6 +1,5 @@
-import { Grid, Typography, Button, Autocomplete, TextField } from "@mui/material";
-import React, { Fragment, useEffect, useState } from "react";
-import Calculator from "../calculator";
+import { Autocomplete, Button, Grid, TextField, Typography } from "@mui/material";
+import { Fragment, useEffect, useState } from "react";
 import SmallTextField from "../custom/SmallTextField";
 export default function OptionsView(props_: any) {
 
@@ -14,7 +13,7 @@ export default function OptionsView(props_: any) {
 
     return (
         <Fragment>
-            <Grid container spacing={2}>
+            <Grid container className='regular-container'>
                 <Grid item xs={12}>
                     <Typography className='var-typo' variant="h5">{props.variable.question}</Typography>
                 </Grid>
@@ -86,7 +85,7 @@ export default function OptionsView(props_: any) {
                     <Grid item xs={12}>
                         <Button
                             key="calc-btn"
-                            onClick={() => { props.setDoCalc(true) }}
+                            onClick={() => { props.showCalculator() }}
                             variant='outlined'
                             style={{ width: '100%' }}
                         >

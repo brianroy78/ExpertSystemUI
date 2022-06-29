@@ -1,24 +1,32 @@
-import { Grid, Typography } from '@mui/material'
-import { Fragment, useState } from 'react'
-import Calculator from '../calculator'
+import { Backdrop, Button, CircularProgress, Grid, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
 import { CustomTypography } from '../custom/CustomTypographys'
-import { inferenceRespond } from '../fetcher'
+import { deleteInference, inferenceRespond, getSessionIdFrom, getSessionId } from '../fetcher'
+import Calculator from './Calculator'
 import ClientView from './ClientView'
 import ConclusionsView from './ConclusionsView'
 import OptionsView from './OptionsView'
 import QuotationsView from './QuotationsView'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import './index.css'
 
-export default function InferenceView() {
+export default function InferenceView(inputProps:any) {
+
     const [autoValue, setAutoValue] = useState<any>(null)
     const [autoHidden, setAutoHidden] = useState<any>(false)
+    const [props, setProps] = useState(inputProps)
 
     const [conclusions, setConclusions] = useState<any>([])
     const [client, setClient] = useState<any>(null)
     const [variable, setVariable] = useState<any>(null)
-    const [doCalc, setDoCalc] = useState(false)
 
     const [sessionId, setSessionId] = useState(null)
     const [step, setStep] = useState(0)
+    const [backwardSteps, setBackwardSteps] = useState([])
+    const [forwardSteps, setForwardSteps] = useState<any>([])
+    const [lastPosition, setLastPosition] = useState(0)
+    const [quickstartData, setQuickstartData] = useState<any>(null)
 
 
     const respond = (value: any) => {
@@ -32,7 +40,7 @@ export default function InferenceView() {
 
     const analyze = (data: any) => {
         if (data.finished) {
-            setStep(3)
+            setStep(4)
             setConclusions(data.conclusions)
         } else {
             let sortedOptions = data.variable.options.sort((a: any, b: any) => a.order - b.order)
@@ -46,50 +54,155 @@ export default function InferenceView() {
         setStep(1)
     }
 
-    function startQuotation(data: any) {
-        setSessionId(data.id)
-        analyze(data)
-        setStep(2)
+    function startQuotation(quotationId: any, selectedOptionId: any) {
+        props.setLockScreen(true)
+        if (selectedOptionId == null) {
+            getSessionId({ quotation_id: quotationId }, (json: any) => {
+                setSessionId(json.data.id)
+                analyze(json.data)
+                setStep(2)
+                props.setLockScreen(false)
+            })
+        } else {
+            getSessionIdFrom({
+                quotation_id: quotationId,
+                selected_option_id: selectedOptionId
+            }, (json: any) => {
+                setSessionId(json.data.id)
+                analyze(json.data)
+                setStep(2)
+                props.setLockScreen(false)
+            })
+
+        }
+        setQuickstartData({
+            quotationId: quotationId,
+            selectedOptionId: selectedOptionId
+        })
+    }
+
+    const showCalculator = () => {
+        setStep(3)
     }
 
     const calcRespond = (response: any) => {
-        setDoCalc(false)
+        setStep(2)
         respond(response)
     }
+
+    const back = () => {
+        if (step === 1) {
+            setStep(0)
+            setForwardSteps([...forwardSteps, client])
+            setClient(null)
+            return
+        }
+        if (step === 2) {
+            setForwardSteps([...forwardSteps, quickstartData])
+            setQuickstartData(null)
+            deleteInference({ id: sessionId }, (json: any) => { })
+            setStep(1)
+            return
+        }
+        if (step === 3) {
+            setStep(2)
+            return
+        }
+        if (step === 4) {
+            setStep(2)
+            return
+        }
+    }
+
+    const next = () => {
+        if (forwardSteps.length === 0) {
+            return
+        }
+
+        if (step === 0) {
+            selectQuotation(forwardSteps.pop())
+        }
+
+        if (step === 1) {
+            let data = forwardSteps.pop()
+            console.log(data)
+            startQuotation(data.quotationId, data.selectedOptionId)
+        }
+
+    }
+
+    useEffect(() => {
+        setProps(inputProps)
+    }, [inputProps]);
 
     return (
         <Grid
             container
-            spacing={4}
             justifyContent="space-evenly"
+            className='regular-container'
         >
             <Grid item xs={12}><CustomTypography>Cotización</CustomTypography></Grid>
-            {(client != null) ? (<Grid item xs={12}><Typography
-                style={{ textAlign: 'center' }}
-                variant="h6"
-            >Cliente: {client.name} {client.last_name} </Typography></Grid>) : ''}
-            {(!doCalc) ?
-                <Fragment>
-                    {(step === 0) ? (<ClientView setClientId={selectQuotation} />) : ''}
-                    {(step === 1) ? (<QuotationsView clientId={client.id} startQuotation={startQuotation} />) : ''}
-                    {(step === 2) ? (
-                        <Grid item xs={6}>
-                            <OptionsView
-                                variable={variable}
-                                respond={respond}
-                                autoHidden={autoHidden}
-                                autoValue={autoValue}
-                                setDoCalc={setDoCalc}
-                            />
+            <Grid item xs={12}>
+                <Grid
+                    container
+                    justifyContent="space-evenly">
+                    <Grid item xs={4}>
+                        <Grid container justifyContent="space-between" className='regular-container'>
+                            <Grid item xs={4}>
+                                <Button
+                                    key='back-btn'
+                                    onClick={back}
+                                    variant='outlined'
+                                    style={{ width: '100%' }}
+                                    startIcon={<ArrowBackIcon />}
+                                >
+                                    Atras</Button>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Button
+                                    disabled={forwardSteps.length === 0}
+                                    key='forward-btn'
+                                    onClick={next}
+                                    variant='outlined'
+                                    style={{ width: '100%' }}
+                                    endIcon={<ArrowForwardIcon />}
+                                >
+                                    Siguiente</Button>
+                            </Grid>
                         </Grid>
-                    ) : ''}
-
-                    {(step === 3) ? (<ConclusionsView conclusions={conclusions} />) : ''}
-                </Fragment> :
-                <Grid item xs={11}>
-                    <Calculator respond={calcRespond} />
+                    </Grid>
                 </Grid>
-            }
+            </Grid>
+
+            {(client != null) ? (
+                <Grid item xs={12}><Typography
+                    style={{ textAlign: 'center', marginBottom: '20px' }}
+                    variant="h6"
+                >Cliente: {client.name} {client.last_name} </Typography></Grid>) : ''}
+
+            {(step === 0) ? (
+                <Grid item xs={4}><ClientView setClientId={selectQuotation} /> </Grid>
+            ) : ''}
+            {(step === 1) ? (
+                <Grid item xs={4}><QuotationsView clientId={client.id} startQuotation={startQuotation} /></Grid>
+            ) : ''}
+            {(step === 2) ? (
+                <Grid item xs={4}>
+                    <OptionsView
+                        variable={variable}
+                        respond={respond}
+                        autoHidden={autoHidden}
+                        autoValue={autoValue}
+                        showCalculator={showCalculator}
+                    />
+                </Grid>
+            ) : ''}
+            {(step === 3) ? (
+                <Grid item xs={8}><Calculator respond={calcRespond} /></Grid>
+            ) : ''}
+            {(step === 4) ? (
+                <Grid item xs={4}><ConclusionsView conclusions={conclusions} /></Grid>
+            ) : ''}
         </Grid>
     );
 }

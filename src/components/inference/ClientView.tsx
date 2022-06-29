@@ -52,91 +52,87 @@ export default function ClientView(props: any) {
     }, [props]);
 
     return (
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container justifyContent="center" className='regular-container'>
             <Grid item xs={12}>
                 <Tabs value={value} onChange={handleChange} centered>
                     <Tab label="Nuevo Cliente" value={0} onClick={clear} />
                     <Tab label="Buscar Cliente" value={1} onClick={clear} />
                 </Tabs>
             </Grid>
-            <Grid item xs={4}>
-                <Grid container spacing={2}>
-                    <Grid hidden={value !== 1} item xs={12}>
-                        <Autocomplete
-                            size="small"
-                            disablePortal
-                            options={clients}
-                            value={selectedClient || null}
-                            sx={{ width: '100%' }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Nombres y Apellidos"
-                                    inputProps={{
-                                        ...params.inputProps,
-                                        autoComplete: 'new-password',
-                                    }}
-                                />
-                            )}
-                            getOptionLabel={(option: any) => option.name + " " + option.last_name}
-                            onChange={selectClient}
+            <Grid hidden={value !== 1} item xs={12}>
+                <Autocomplete
+                    size="small"
+                    disablePortal
+                    options={clients}
+                    value={selectedClient || null}
+                    sx={{ width: '100%' }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Nombres y Apellidos"
+                            inputProps={{
+                                ...params.inputProps,
+                                autoComplete: 'new-password',
+                            }}
                         />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Nombres"
-                            value={client.name}
-                            onChange={setName}
-                            disabled={value === 1}
+                    )}
+                    getOptionLabel={(option: any) => option.name + " " + option.last_name}
+                    onChange={selectClient}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <SmallTextField
+                    label="Nombres"
+                    value={client.name}
+                    onChange={setName}
+                    disabled={value === 1}
 
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Apellidos"
-                            value={client.last_name}
-                            onChange={setLastName}
-                            disabled={value === 1}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Número Telefónico"
-                            value={client.phone_number}
-                            onChange={setPhoneNumber}
-                            disabled={value === 1}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallTextField
-                            label="Email"
-                            value={client.email}
-                            onChange={setEmail}
-                            disabled={value === 1}
-                        />
-                    </Grid>
-                    <Grid hidden={value !== 0} item xs={12}>
-                        <Button
-                            variant="outlined"
-                            style={{ width: '100%' }}
-                            endIcon={<SaveOutlinedIcon />}
-                            onClick={createClient}
-                        >
-                            Guardar
-                        </Button >
-                    </Grid>
-                    <Grid hidden={value !== 1} item xs={12}>
-                        <Button
-                            disabled={client.id == null}
-                            variant="outlined"
-                            style={{ width: '100%' }}
-                            endIcon={<CheckIcon />}
-                            onClick={selectClientId}
-                        >
-                            Seleccionar
-                        </Button >
-                    </Grid>
-                </Grid>
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <SmallTextField
+                    label="Apellidos"
+                    value={client.last_name}
+                    onChange={setLastName}
+                    disabled={value === 1}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <SmallTextField
+                    label="Número Telefónico"
+                    value={client.phone_number}
+                    onChange={setPhoneNumber}
+                    disabled={value === 1}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <SmallTextField
+                    label="Email"
+                    value={client.email}
+                    onChange={setEmail}
+                    disabled={value === 1}
+                />
+            </Grid>
+            <Grid hidden={value !== 0} item xs={12}>
+                <Button
+                    variant="outlined"
+                    style={{ width: '100%' }}
+                    endIcon={<SaveOutlinedIcon />}
+                    onClick={createClient}
+                >
+                    Guardar
+                </Button >
+            </Grid>
+            <Grid hidden={value !== 1} item xs={12}>
+                <Button
+                    disabled={client.id == null}
+                    variant="outlined"
+                    style={{ width: '100%' }}
+                    endIcon={<CheckIcon />}
+                    onClick={selectClientId}
+                >
+                    Seleccionar
+                </Button >
             </Grid>
         </Grid>
     )

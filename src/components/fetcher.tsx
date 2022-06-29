@@ -17,9 +17,10 @@ export function insert(obj: any, callback: Function) { return fetch_('/insert', 
 export function update(obj: any, callback: Function) { return fetch_('/update', obj, callback) }
 export function delete_(obj: any, callback: Function) { return fetch_('/delete', obj, callback) }
 export function list(obj: any, callback: Function) { return fetch_('/list', obj, callback) }
-export function startQuotation(obj: any, callback: Function) { return fetch_('/inference/start', obj, callback) }
-export function startQuotationFrom(obj: any, callback: Function) { return fetch_('/inference/start/from', obj, callback) }
+export function getSessionId(obj: any, callback: Function) { return fetch_('/inference/start', obj, callback) }
+export function getSessionIdFrom(obj: any, callback: Function) { return fetch_('/inference/start/from', obj, callback) }
 export function inferenceRespond(obj: any, callback: Function) { return fetch_('/inference/respond', obj, callback) }
+export function deleteInference(obj: any, callback: Function) { return fetch_('/inference/delete', obj, callback) }
 
 
 export function insertVariable(obj: any, callback: Function) { return insert({ ...obj, _type_: 'variable' }, callback) }

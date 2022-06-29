@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Backdrop, CircularProgress, Grid } from '@mui/material';
 import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router, Route, Routes
@@ -10,8 +10,10 @@ import SideMenu from './components/menu/menu';
 import RulesView from './components/rules';
 import VariableView from './components/variables';
 
+
 function App(props: any) {
   const [AppProps, setProps] = React.useState(props)
+  const [lockScreen, setLockScreen] = React.useState(false)
 
 
   useEffect(() => {
@@ -22,7 +24,6 @@ function App(props: any) {
     <Router>
       <Grid
         container
-        spacing={4}
         justifyContent="space-evenly"
       >
         <Grid item xs={12}>
@@ -44,10 +45,16 @@ function App(props: any) {
             <Route path="/" element={<MainView />}></Route>
             <Route path="/variable" element={<VariableView />}></Route>
             <Route path="/rule" element={<RulesView />}></Route>
-            <Route path="/inference" element={<InferenceView />}></Route>
+            <Route path="/inference" element={<InferenceView setLockScreen={setLockScreen} />}></Route>
           </Routes>
         </Grid>
       </Grid>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={lockScreen}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Router>
   );
 }
