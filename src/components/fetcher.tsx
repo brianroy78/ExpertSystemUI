@@ -21,6 +21,7 @@ export function getSessionId(obj: any, callback: Function) { return fetch_('/inf
 export function getSessionIdFrom(obj: any, callback: Function) { return fetch_('/inference/start/from', obj, callback) }
 export function inferenceRespond(obj: any, callback: Function) { return fetch_('/inference/respond', obj, callback) }
 export function deleteInference(obj: any, callback: Function) { return fetch_('/inference/delete', obj, callback) }
+export function inferenceBack(obj: any, callback: Function) { return fetch_('/inference/back', obj, callback) }
 
 
 export function insertVariable(obj: any, callback: Function) { return insert({ ...obj, _type_: 'variable' }, callback) }

@@ -12,8 +12,8 @@ export default function ConclusionsView(props_: any) {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell><TableHeader>Nombre de la Variable</TableHeader></TableCell>
-                        <TableCell><TableHeader>Nombre del Valor</TableHeader></TableCell>
+                        <TableCell><TableHeader>Variable</TableHeader></TableCell>
+                        <TableCell><TableHeader>Valor</TableHeader></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

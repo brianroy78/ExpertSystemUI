@@ -1,17 +1,17 @@
-import { Backdrop, Button, CircularProgress, Grid, Typography } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import { Button, Grid, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { CustomTypography } from '../custom/CustomTypographys'
-import { deleteInference, inferenceRespond, getSessionIdFrom, getSessionId } from '../fetcher'
+import { deleteInference, getSessionId, getSessionIdFrom, inferenceBack, inferenceRespond } from '../fetcher'
 import Calculator from './Calculator'
 import ClientView from './ClientView'
 import ConclusionsView from './ConclusionsView'
+import './index.css'
 import OptionsView from './OptionsView'
 import QuotationsView from './QuotationsView'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import './index.css'
 
-export default function InferenceView(inputProps:any) {
+export default function InferenceView(inputProps: any) {
 
     const [autoValue, setAutoValue] = useState<any>(null)
     const [autoHidden, setAutoHidden] = useState<any>(false)
@@ -23,15 +23,16 @@ export default function InferenceView(inputProps:any) {
 
     const [sessionId, setSessionId] = useState(null)
     const [step, setStep] = useState(0)
-    const [backwardSteps, setBackwardSteps] = useState([])
     const [forwardSteps, setForwardSteps] = useState<any>([])
-    const [lastPosition, setLastPosition] = useState(0)
+    const [selectedOptions, setSelectedOptions] = useState<any>([])
     const [quickstartData, setQuickstartData] = useState<any>(null)
 
 
     const respond = (value: any) => {
         setAutoValue(null)
         setAutoHidden(true)
+        setForwardSteps([])
+        setSelectedOptions([...selectedOptions, value])
         inferenceRespond({ id: sessionId, value_name: value }, (json: any) => {
             setAutoHidden(false)
             analyze(json.data)
@@ -49,9 +50,11 @@ export default function InferenceView(inputProps:any) {
         }
     }
 
-    function selectQuotation(client: any) {
+    function showQuotations(client: any) {
         setClient(client);
         setStep(1)
+        setForwardSteps([])
+
     }
 
     function startQuotation(quotationId: any, selectedOptionId: any) {
@@ -75,6 +78,7 @@ export default function InferenceView(inputProps:any) {
             })
 
         }
+        setForwardSteps([])
         setQuickstartData({
             quotationId: quotationId,
             selectedOptionId: selectedOptionId
@@ -98,10 +102,17 @@ export default function InferenceView(inputProps:any) {
             return
         }
         if (step === 2) {
-            setForwardSteps([...forwardSteps, quickstartData])
-            setQuickstartData(null)
-            deleteInference({ id: sessionId }, (json: any) => { })
-            setStep(1)
+            inferenceBack({ id: sessionId }, (json: any) => {
+                if (json.data.empty) {
+                    setForwardSteps([...forwardSteps, quickstartData])
+                    setQuickstartData(null)
+                    deleteInference({ id: sessionId }, (json: any) => { })
+                    setStep(1)
+                } else {
+                    setForwardSteps([...forwardSteps, selectedOptions.pop()])
+                    analyze(json.data)
+                }
+            })
             return
         }
         if (step === 3) {
@@ -118,15 +129,17 @@ export default function InferenceView(inputProps:any) {
         if (forwardSteps.length === 0) {
             return
         }
-
         if (step === 0) {
-            selectQuotation(forwardSteps.pop())
+            showQuotations(forwardSteps.pop())
         }
 
         if (step === 1) {
             let data = forwardSteps.pop()
-            console.log(data)
             startQuotation(data.quotationId, data.selectedOptionId)
+        }
+
+        if (step === 2) {
+            respond(forwardSteps.pop())
         }
 
     }
@@ -150,6 +163,7 @@ export default function InferenceView(inputProps:any) {
                         <Grid container justifyContent="space-between" className='regular-container'>
                             <Grid item xs={4}>
                                 <Button
+                                    disabled={step === 4}
                                     key='back-btn'
                                     onClick={back}
                                     variant='outlined'
@@ -181,7 +195,7 @@ export default function InferenceView(inputProps:any) {
                 >Cliente: {client.name} {client.last_name} </Typography></Grid>) : ''}
 
             {(step === 0) ? (
-                <Grid item xs={4}><ClientView setClientId={selectQuotation} /> </Grid>
+                <Grid item xs={4}><ClientView setClientId={showQuotations} /> </Grid>
             ) : ''}
             {(step === 1) ? (
                 <Grid item xs={4}><QuotationsView clientId={client.id} startQuotation={startQuotation} /></Grid>
